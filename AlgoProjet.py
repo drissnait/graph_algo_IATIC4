@@ -28,6 +28,7 @@ def generationGrapheAleatoireEdgarGilbert():
     p=0.5
     g=erdos_renyi_graph(n,p)
     EnregistrerGrapheAlea(g)
+    diametreGraphe(g,n,0,4)
 
 """
 Generer un graphe aleatoire avec la methode de edgard Gilbert
@@ -41,6 +42,7 @@ def generationGrapheAleatoireBarabasiAlbert():
    
     g = nx.barabasi_albert_graph(final_nodes, m_parameter)
     EnregistrerGrapheAlea(g)
+    diametreGraphe(g,n,0,4)
     
     
 def EnregistrerGrapheAlea(g):
@@ -116,6 +118,7 @@ Ditribution de degres sous forme de graphique (Qst 2.5)
 def graphique():
     dataFile= sys.argv[3]
     dfData=pd.read_csv(dataFile, sep=",")
+    print(dfData)
     listeSommetsOccurences={}
     listeSommets1=list(dfData.id_1)
     listeSommets2=list(dfData.id_2)
@@ -132,6 +135,33 @@ def graphique():
     plt.ylabel('frequence')
     plt.show()
 
+def diametreGraphe(g,n,si,sf):
+    #initialisation
+    Dict={}
+    Dict[si]=[0,[si]]
+    for i in list(g.nodes):
+        if(i!=si):
+            Dict[i]=[-1,[]]
+   
+    #-------
+    
+    print("liste des voisins  "+ str(list(g.neighbors(1))))
+    print("first dict " + str(Dict))
+    
+    for i in list(g.nodes):
+        print("a l'interieur voisins de " + str(i) +" est "+ str(list(g.neighbors(i))))
+        for j in list(g.neighbors(i)):
+            if(j>i):
+                if((Dict.get(i)[0] + 1) > Dict.get(j)[0]):
+                   Dict.get(j)[0] = Dict.get(i)[0] + 1
+                   Dict.get(j)[1]=(Dict.get(i)[1])
+                   Dict.get(j)[1].append(j)
+                   print("pour le sommet "+ str(j) + " on a :" + str(Dict[j]))
+            else:
+                continue
+               
+    #print("last dict " + str(Dict))
+
 
 
 def main():
@@ -147,9 +177,9 @@ def main():
        sys.exit()
     
     #
-    showGeneratedGraph()
-    readFile()
-    graphique()
+    #showGeneratedGraph()
+    #readFile()
+    #graphique()
 
 if __name__ == "__main__":
     main()
