@@ -28,30 +28,34 @@ def generationGrapheAleatoireEdgarGilbert():
     p=0.5
     g=erdos_renyi_graph(n,p)
     EnregistrerGrapheAlea(g)
-    diametreGraphe(g,n,0,4)
 
 """
 Generer un graphe aleatoire avec la methode de edgard Gilbert
 """
 def generationGrapheAleatoireBarabasiAlbert():
     n= int(sys.argv[1])
-    # Get parameters
-    #init_nodes = 3
+    #parametres
     final_nodes = n
     m_parameter = 2
    
     g = nx.barabasi_albert_graph(final_nodes, m_parameter)
     EnregistrerGrapheAlea(g)
-    diametreGraphe(g,n,0,4)
-    
-    
+
+"""
+afficher le graphe et l'enregistrer dans une image et le stocker dans un fichier csv  "GrapheGenere.csv"    
+"""    
 def EnregistrerGrapheAlea(g):
     print("liste des noeuds : ")
     print (g.nodes)
     print("liste des arrêtes : ")
     print(g.edges)
+    
+    
+    #enregistrer le graphe genere aleatoirement dans une image
     nx.draw(g, with_labels=True, font_weight='bold')
-    plt.savefig("graph.png")#enregistrer le graphe genere aleatoirement dans une image
+    plt.savefig("graph.png")
+    
+    #stocker le graphe dans un fichier csv "GrapheGenere.csv"
     listeArretes=list(g.edges)
     if os.path.exists('GrapheGenere.csv'):
         os.remove('GrapheGenere.csv')
@@ -82,43 +86,73 @@ def showGeneratedGraph():
    img.show()
 
 """
-Etude des fichiers de donnees csv (deuxieme partie du projet)
+Partie 2 :Etude des fichiers de donnees csv 
 """
-####################################################################################
-#Les fichiers de lecture sont des fichiers csv qui avec id_1 & id_2 comme entete
-######################################################################################
+#########################################################################################################
+#Les fichiers de lecture sont des fichiers csv qui avec id_1 & id_2 comme entete et ',' comme separateur
+#########################################################################################################
 def readFile():
-    dataFile= sys.argv[3]
+
+    dataFile= sys.argv[3]                    #fichier donné en entreé ==>sys.argv[3]
     dfData=pd.read_csv(dataFile, sep=",")
     listeSommets1=dfData.id_1
-    listeSommets1SR=list(set(listeSommets1))
+    
+    #enlever les doublons pour calculer le nombre des sommets 
+    listeSommets1SR=list(set(listeSommets1))  
     listeSommets2=dfData.id_2
     listeSommets2SR=list(set(listeSommets2))
     listeSommets=listeSommets1SR+listeSommets2SR
     listeSommets=list(set(listeSommets))
     
     print("Nombre de sommets  : " + str(len(listeSommets)))
-    print("Nombre d'arrêtes : " + str(dfData.shape[0])) #nombre de lignes
+    print("Nombre d'arrêtes : " + str(dfData.shape[0]))     #nombre de lignes
+    
     ##########Degré maximal##########
     listeSommetsOccurences={}
     listeS=list(listeSommets1) + list(listeSommets2)
     for i in listeSommets:
         listeSommetsOccurences[i] = listeS.count(i)      #nombre d'occurence de chaque sommet
-    sortedDict = sorted(listeSommetsOccurences.values()) #trier la liste par ordre croissant
-    maxF = sortedDict[-1]   #le dernier elemnt de la liste
+    listeDegre = sorted(listeSommetsOccurences.values()) #trier la liste des degres par ordre croissant
+    maxF = listeDegre[-1]                                #le dernier element de la liste (le maximum)
     
     print("Degré maximal : " + str(maxF) )
-    degreMoyen= dfData.shape[0]/ float(len(listeSommets))
+    
+    ##########Degré moyen ##########
+    degreMoyen= sum(listeDegre) / float(len(listeSommets))  #degreMoyen=somme(degre)/nombre de sommets
     print("Degré moyen : " + str(degreMoyen))
 
 
 """
-Ditribution de degres sous forme de graphique (Qst 2.5)
+Ditribution de degres sous forme de graphique (Qst 2.5.1)
 """
-def graphique():
+def graphiqueDegres():
     dataFile= sys.argv[3]
     dfData=pd.read_csv(dataFile, sep=",")
-    print(dfData)
+    listeSommetsOccurences={}
+    listesDegreOccurences={}
+    listeSommets1=list(dfData.id_1)
+    listeSommets2=list(dfData.id_2)
+    listeSommets=listeSommets1 + listeSommets2
+
+    for i in listeSommets:
+        listeSommetsOccurences[i] = listeSommets.count(i) 
+    for i in listeSommetsOccurences.values():
+        listesDegreOccurences[i] = listeSommetsOccurences.values().count(i)
+    
+    #afficher la distribution des degrés sous forme de graphique (en abscisse des degrés, et en ordonnée leurs distributions).
+    plt.scatter(listesDegreOccurences.keys(), listesDegreOccurences.values(), c='r')
+    plt.plot(listesDegreOccurences.keys(), listesDegreOccurences.values(), label='f(x)')
+    plt.xlabel('degre')
+    plt.ylabel('frequence')
+    plt.show()
+    
+"""
+supplementaire:
+Ditribution de sommets sous forme de graphique (Qst 2.5.2)
+"""   
+def graphiqueSommets():
+    dataFile= sys.argv[3]
+    dfData=pd.read_csv(dataFile, sep=",")
     listeSommetsOccurences={}
     listeSommets1=list(dfData.id_1)
     listeSommets2=list(dfData.id_2)
@@ -128,39 +162,33 @@ def graphique():
         listeSommetsOccurences[i] = listeSommets.count(i)
 
 
-
+    #afficher la distribution des sommets sous forme de graphique (en abscisse des sommets, et en ordonnée leurs distributions).
     plt.scatter(listeSommetsOccurences.keys(), listeSommetsOccurences.values(), c='r')
     plt.plot(listeSommetsOccurences.keys(), listeSommetsOccurences.values(), label='f(x)')
-    plt.xlabel('degre')
+    plt.xlabel('sommet')
     plt.ylabel('frequence')
     plt.show()
 
+"""
+le diamétre d'un graphe (le plus long chemin )
+"""
 def diametreGraphe(g,n,si,sf):
     #initialisation
     Dict={}
-    Dict[si]=[0,[si]]
+    Dict[si]=[0,[si]]        #O(1) operations
     for i in list(g.nodes):
         if(i!=si):
-            Dict[i]=[-1,[]]
+            Dict[i]=[-1,[]]  #O(n) operations
    
     #-------
-    
-    print("liste des voisins  "+ str(list(g.neighbors(1))))
-    print("first dict " + str(Dict))
-    
-    for i in list(g.nodes):
-        print("a l'interieur voisins de " + str(i) +" est "+ str(list(g.neighbors(i))))
-        for j in list(g.neighbors(i)):
+    for i in list(g.nodes): #la boucle est éxecutée O(n) fois 
+        for j in list(g.neighbors(i)): #la boucle est éxecutée O(n) fois
             if(j>i):
                 if((Dict.get(i)[0] + 1) > Dict.get(j)[0]):
                    Dict.get(j)[0] = Dict.get(i)[0] + 1
-                   Dict.get(j)[1]=(Dict.get(i)[1])
-                   Dict.get(j)[1].append(j)
-                   print("pour le sommet "+ str(j) + " on a :" + str(Dict[j]))
             else:
                 continue
                
-    #print("last dict " + str(Dict))
 
 
 
@@ -177,9 +205,10 @@ def main():
        sys.exit()
     
     #
-    #showGeneratedGraph()
-    #readFile()
-    #graphique()
+    showGeneratedGraph()
+    readFile()
+    graphiqueDegres()
+    graphiqueSommets()
 
 if __name__ == "__main__":
     main()
