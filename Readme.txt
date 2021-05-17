@@ -1,3 +1,23 @@
+We developed our project using python version 2.7.
+We used the following libraries:
+-Pandas : library that will allow us to make the different studies and analyses of the csv files we want to study.
+-csv : library which allows to manipulate the csv files 
+-networkx : a python library for the creation, the manipulation and the study of graphs.
+-PIL (pillow) : library that allows us to display randomly generated edges as a graph stored in an image.
+
+The files that we can process are csv files with commas "," as separator, the headers of the csv file are the following: "id_1,id_2".
+
+The code is launched with the following command:
+"python2 AlgoProject.py n choice File.csv"
+
+The additional arguments that the command takes are as follows:
+-argument 3: n => the number of vertices in the random graph (example: 10)
+-argument 4 : choice => the method with which we want to generate the graph (1 for Edgar's method and 2 for the Barabasi-Albert model)
+-argument 5 : Name of the file we want to study for the second part.
+
+The data of the random graph generated in the first part are stored in a file 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Nous avons développé notre projet en utilisant la version 2.7 de python.
 Nous avons utilisé les bibliothèques suivantes :
